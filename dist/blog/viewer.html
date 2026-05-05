@@ -382,7 +382,7 @@
 
     async function fetchPaperMeta(slug) {
       try {
-        const response = await fetch('/src/data/papers.json');
+        const response = await fetch('../data/papers.json');
         if (!response.ok) throw new Error('metadata unavailable');
         const papers = await response.json();
         return papers.find((paper) => {
@@ -505,7 +505,7 @@
       }
 
       const safe = slug.replace(/[^a-zA-Z0-9-_]/g, '');
-      const path = `/blog/${safe}.md`;
+      const path = `./${safe}.md`;
 
       try {
         const [paperMeta, mdResponse] = await Promise.all([

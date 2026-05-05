@@ -171,7 +171,7 @@ function getBlogUrl(slug) {
 
   const match = slug.match(/\/blog\/(.+)$/);
   const name = match ? match[1].replace(/\/.*/, '') : slug.replace(/\//g, '');
-  return `/blog/viewer.html?slug=${encodeURIComponent(name)}`;
+  return `./blog/viewer.html?slug=${encodeURIComponent(name)}`;
 }
 
 const enhancedPapers = computed(() =>
