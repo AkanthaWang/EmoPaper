@@ -3,57 +3,560 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Article Viewer</title>
+  <title>Emotion Paper Article</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
   <style>
-    :root{--bg:#0f172a;--text:#e6eef8;--muted:#9fb0c8}
-    body{background:linear-gradient(180deg,#071029,#0b1220);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;padding:32px}
-    .container{max-width:900px;margin:0 auto;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:28px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,0.6);}
-    h1{color:#fff;margin-top:0}
-    h2{color:var(--muted)}
-    .meta{color:var(--muted);margin-bottom:18px}
-    .content{background:transparent;color:var(--text);line-height:1.8}
-    pre{background:#011627;padding:14px;border-radius:8px;overflow:auto}
-    a{color:#7dd3fc}
-    img{max-width:100%}
+    :root {
+      --bg: #f3eadf;
+      --paper: rgba(255, 251, 247, 0.9);
+      --text: #2f221a;
+      --muted: #7f6858;
+      --accent: #b85c2f;
+      --accent-soft: rgba(184, 92, 47, 0.12);
+      --border: rgba(125, 90, 67, 0.14);
+      --shadow: 0 28px 80px rgba(69, 40, 20, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 188, 128, 0.3), transparent 24%),
+        radial-gradient(circle at 85% 10%, rgba(177, 82, 45, 0.18), transparent 20%),
+        linear-gradient(180deg, #f5ede4 0%, #efe3d7 48%, #eadfd6 100%);
+      color: var(--text);
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      padding: 18px;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .reader-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .article-card,
+    .toc-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .article-card {
+      padding: 30px;
+      border-radius: 30px;
+    }
+
+    .article-header {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(125, 90, 67, 0.12);
+    }
+
+    .article-kicker {
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .article-title {
+      margin: 0;
+      color: #251811;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: clamp(2.7rem, 6vw, 4.2rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    .article-subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(184, 92, 47, 0.08);
+      border: 1px solid rgba(184, 92, 47, 0.12);
+      color: #6e4b38;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .meta-chip strong {
+      color: #3d271b;
+      font-weight: 600;
+    }
+
+    .toc-card {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+      border-radius: 24px;
+    }
+
+    .toc-title {
+      margin: 0 0 12px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    .toc {
+      display: grid;
+      gap: 10px;
+    }
+
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    .status {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .content {
+      color: var(--text);
+      line-height: 1.9;
+      font-size: 1.02rem;
+    }
+
+    .content > *:first-child {
+      margin-top: 0;
+    }
+
+    .content h1,
+    .content h2,
+    .content h3,
+    .content h4 {
+      color: #251811;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      scroll-margin-top: 28px;
+    }
+
+    .content h1 {
+      font-size: 2.35rem;
+      margin: 0 0 1.1rem;
+    }
+
+    .content h2 {
+      font-size: 2rem;
+      margin: 2.3rem 0 0.85rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid rgba(125, 90, 67, 0.14);
+    }
+
+    .content h3 {
+      font-size: 1.5rem;
+      margin: 1.8rem 0 0.6rem;
+    }
+
+    .content p,
+    .content ul,
+    .content ol,
+    .content blockquote {
+      margin: 1rem 0;
+    }
+
+    .content ul,
+    .content ol {
+      padding-left: 1.25rem;
+    }
+
+    .content li + li {
+      margin-top: 0.45rem;
+    }
+
+    .content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      border-radius: 0 18px 18px 0;
+      color: #5a4638;
+    }
+
+    .content a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(184, 92, 47, 0.22);
+    }
+
+    .content hr {
+      border: 0;
+      height: 1px;
+      background: rgba(125, 90, 67, 0.14);
+      margin: 2rem 0;
+    }
+
+    .content code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 0.18em 0.42em;
+      border-radius: 8px;
+      background: rgba(102, 76, 60, 0.08);
+      color: #7c3215;
+    }
+
+    .content pre {
+      margin: 1.3rem 0;
+      padding: 18px;
+      border-radius: 20px;
+      background: #1d2432;
+      overflow: auto;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .content pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.4rem 0;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(125, 90, 67, 0.12);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .content th,
+    .content td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(125, 90, 67, 0.08);
+    }
+
+    .content th {
+      color: #5f4739;
+      background: rgba(184, 92, 47, 0.06);
+    }
+
+    .content img {
+      max-width: 100%;
+      border-radius: 22px;
+      display: block;
+      margin: 1.5rem auto;
+      box-shadow: 0 20px 60px rgba(57, 29, 15, 0.18);
+    }
+
+    .content .katex-display {
+      margin: 1.4rem 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.2rem 0;
+    }
+
+    .content .katex {
+      font-size: 1.05em;
+    }
+
+    .error-card {
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(255, 245, 241, 0.88);
+      border: 1px solid rgba(184, 92, 47, 0.18);
+      color: #7b3820;
+    }
+
+    @media (max-width: 980px) {
+      .reader-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .toc-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+
+      .article-card,
+      .toc-card {
+        border-radius: 24px;
+      }
+
+      .article-card {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="article">
-      <h1>Loading…</h1>
-    </div>
-  </div>
+  <main class="page">
+    <section class="reader-shell">
+      <article class="article-card">
+        <header class="article-header">
+          <p class="article-kicker">Paper Insight</p>
+          <h1 id="article-title" class="article-title">文章加载中</h1>
+          <p id="article-subtitle" class="article-subtitle">正在读取论文标题信息与正文内容。</p>
+          <div id="article-meta" class="article-meta"></div>
+        </header>
+
+        <div id="article">
+          <p class="status">内容加载中，请稍候...</p>
+        </div>
+      </article>
+
+      <aside class="toc-card">
+        <p class="toc-title">On This Page</p>
+        <nav id="toc" class="toc">
+          <span class="status">等待内容生成目录...</span>
+        </nav>
+      </aside>
+    </section>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script>
+    marked.setOptions({
+      breaks: true,
+      gfm: true
+    });
+
     function getQuery(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    async function fetchAndRender(slug) {
-      if (!slug) {
-        document.getElementById('article').innerHTML = '<h1>No slug provided</h1>';
+    function slugToTitle(slug) {
+      return slug
+        .split(/[-_]/g)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+
+    async function fetchPaperMeta(slug) {
+      try {
+        const response = await fetch('/src/data/papers.json');
+        if (!response.ok) throw new Error('metadata unavailable');
+        const papers = await response.json();
+        return papers.find((paper) => {
+          const blogSlug = paper.blog?.slug || '';
+          return paper.id === slug || blogSlug.endsWith(`/${slug}`);
+        }) || null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function buildToc(container) {
+      const headings = [...container.querySelectorAll('h1, h2, h3')];
+      const toc = document.getElementById('toc');
+
+      if (!headings.length) {
+        toc.innerHTML = '<span class="status">当前文章没有可生成的章节目录。</span>';
         return;
       }
 
-      // sanitize slug: allow only letters, numbers, dash and underscore
+      toc.innerHTML = headings.map((heading, index) => {
+        if (!heading.id) heading.id = `section-${index + 1}`;
+        return `<a href="#${heading.id}">${heading.textContent}</a>`;
+      }).join('');
+    }
+
+    function enhanceImages(container) {
+      container.querySelectorAll('img').forEach((img) => {
+        const originalSrc = img.getAttribute('src') || '';
+        const cleanedSrc = originalSrc.replace(/#.*$/, '');
+        if (cleanedSrc && cleanedSrc !== originalSrc) {
+          img.setAttribute('src', cleanedSrc);
+        }
+
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.alt = img.alt || 'article illustration';
+      });
+    }
+
+    function waitForKatex(retries = 40) {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.katex && typeof window.katex.renderToString === 'function') {
+            resolve(true);
+            return;
+          }
+
+          if (retries <= 0) {
+            resolve(false);
+            return;
+          }
+
+          retries -= 1;
+          window.setTimeout(check, 100);
+        };
+
+        check();
+      });
+    }
+
+    function extractMath(md) {
+      const mathTokens = [];
+      let next = md;
+
+      next = next.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+        const token = `@@MATH_BLOCK_${mathTokens.length}@@`;
+        mathTokens.push({ token, expr: expr.trim(), displayMode: true });
+        return token;
+      });
+
+      next = next.replace(/(?<!\$)\$([^$\n]+?)\$(?!\$)/g, (_, expr) => {
+        const token = `@@MATH_INLINE_${mathTokens.length}@@`;
+        mathTokens.push({ token, expr: expr.trim(), displayMode: false });
+        return token;
+      });
+
+      next = next.replace(/\\\(([\s\S]+?)\\\)/g, (_, expr) => {
+        const token = `@@MATH_INLINE_${mathTokens.length}@@`;
+        mathTokens.push({ token, expr: expr.trim(), displayMode: false });
+        return token;
+      });
+
+      next = next.replace(/\\\[([\s\S]+?)\\\]/g, (_, expr) => {
+        const token = `@@MATH_BLOCK_${mathTokens.length}@@`;
+        mathTokens.push({ token, expr: expr.trim(), displayMode: true });
+        return token;
+      });
+
+      return { markdown: next, mathTokens };
+    }
+
+    function renderMathTokens(html, mathTokens) {
+      if (!window.katex || typeof window.katex.renderToString !== 'function') {
+        return html;
+      }
+
+      return mathTokens.reduce((output, item) => {
+        const rendered = window.katex.renderToString(item.expr, {
+          displayMode: item.displayMode,
+          throwOnError: false
+        });
+        return output.replaceAll(item.token, rendered);
+      }, html);
+    }
+
+    async function fetchAndRender(slug) {
+      const article = document.getElementById('article');
+      const titleNode = document.getElementById('article-title');
+      const subtitleNode = document.getElementById('article-subtitle');
+      const metaNode = document.getElementById('article-meta');
+
+      if (!slug) {
+        article.innerHTML = '<div class="error-card"><h2>缺少文章标识</h2><p>请从时间线页面重新进入文章详情页。</p></div>';
+        titleNode.textContent = '未找到文章';
+        subtitleNode.textContent = '当前链接缺少 slug 参数，无法定位对应的论文与正文。';
+        metaNode.innerHTML = '';
+        return;
+      }
+
       const safe = slug.replace(/[^a-zA-Z0-9-_]/g, '');
       const path = `/blog/${safe}.md`;
 
       try {
-        const res = await fetch(path);
-        if (!res.ok) throw new Error('Not found');
-        const md = await res.text();
-        const html = marked.parse(md);
-        document.getElementById('article').innerHTML = `<div class="content">${html}</div>`;
+        const [paperMeta, mdResponse] = await Promise.all([
+          fetchPaperMeta(safe),
+          fetch(path)
+        ]);
+
+        if (!mdResponse.ok) throw new Error('文章不存在或路径错误');
+
+        const md = await mdResponse.text();
+        const fallbackTitle = slugToTitle(safe);
+        const title = paperMeta?.title || fallbackTitle;
+        const subtitle = paperMeta?.fullTitle || '暂无论文全称信息';
+        const metaParts = [];
+
+        if (paperMeta?.venue) {
+          metaParts.push(`<span class="meta-chip"><strong>Venue</strong>${paperMeta.venue}</span>`);
+        }
+
+        if (paperMeta?.tags?.length) {
+          metaParts.push(...paperMeta.tags.map((tag) => `<span class="meta-chip">#${tag}</span>`));
+        }
+
+        titleNode.textContent = title;
+        subtitleNode.textContent = subtitle;
+        metaNode.innerHTML = metaParts.join('');
+        document.title = `${title} | Emotion Paper`;
+
+        const cleanedMarkdown = md
+          .replace(/^---[\s\S]*?---\s*/m, '')
+          .replace(/^@\[ToC\]\s*$/gm, '');
+        const { markdown: protectedMarkdown, mathTokens } = extractMath(cleanedMarkdown);
+        const html = marked.parse(protectedMarkdown);
+        const katexReady = await waitForKatex();
+        const finalHtml = katexReady ? renderMathTokens(html, mathTokens) : html;
+
+        article.innerHTML = `<div class="content">${finalHtml}</div>`;
+
+        enhanceImages(article);
+
         document.querySelectorAll('pre code').forEach((block) => {
           hljs.highlightElement(block);
         });
+
+        buildToc(article);
       } catch (err) {
-        document.getElementById('article').innerHTML = `<h1>无法加载文章</h1><p>${err.message}</p>`;
+        article.innerHTML = `<div class="error-card"><h2>无法加载文章</h2><p>${err.message}</p></div>`;
+        titleNode.textContent = '文章加载失败';
+        subtitleNode.textContent = '未能读取对应的论文标题或 Markdown 正文内容。';
+        metaNode.innerHTML = '';
+        document.getElementById('toc').innerHTML = '<span class="status">当前没有可展示的目录。</span>';
       }
     }
 

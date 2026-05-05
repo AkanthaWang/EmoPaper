@@ -1,5 +1,21 @@
 [
   {
+    "id": "emoe",
+    "title": "EMOE",
+    "fullTitle": "EMOE: Modality-Specific Enhanced Dynamic Emotion Experts",
+    "acronym": "EMOE",
+    "year": 2025,
+    "type": "Method",
+    "modality": "image",
+    "tags": ["FER", "Image", "Wild"],
+    "contribution": "A large-scale facial expression dataset collected in the wild, widely used in affective computing research.",
+    "blog": {
+      "enabled": true,
+      "slug": "/blog/emoe"
+    },
+    "venue": "CVPR"
+  },
+  {
     "id": "affectnet",
     "title": "AffectNet",
     "fullTitle": "AffectNet: A Database for Facial Expression, Valence, and Arousal Computing in the Wild",

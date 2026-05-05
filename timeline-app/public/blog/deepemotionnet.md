@@ -8,6 +8,8 @@ title: Deep Emotion Network Analysis
 
 Deep Emotion Network describes an image-based emotional representation approach that follows the general trend of using deep models to learn affective features directly from data.
 
+![你好](../img/image.png)
+
 ## Main Idea
 
 The core idea is to move from hand-crafted feature pipelines toward learned representations that can better capture high-level semantic cues related to emotion.
