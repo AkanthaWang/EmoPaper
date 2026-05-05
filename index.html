@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EmoPaper - 情感图像分析时间线与博客系统</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-soft: #11182f;
+      --panel: rgba(16, 24, 46, 0.78);
+      --panel-strong: rgba(19, 29, 57, 0.96);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #eef3ff;
+      --muted: #aeb8d4;
+      --accent: #ff7a59;
+      --accent-2: #66d9ff;
+      --accent-3: #9cff6b;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max: 1180px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --sans: "Trebuchet MS", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at top left, rgba(255, 122, 89, 0.22), transparent 34%),
+        radial-gradient(circle at top right, rgba(102, 217, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 20% 80%, rgba(156, 255, 107, 0.12), transparent 20%),
+        linear-gradient(180deg, #060914 0%, var(--bg) 35%, #090e1c 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent 90%);
+      opacity: 0.35;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 24px;
+      padding: 24px 0 10px;
+      align-items: stretch;
+    }
+
+    .hero-main,
+    .hero-side,
+    .panel {
+      background: linear-gradient(180deg, rgba(21, 31, 58, 0.9), rgba(13, 20, 39, 0.9));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-main {
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -70px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 122, 89, 0.25), transparent 68%);
+      filter: blur(2px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #ffbd59);
+      box-shadow: 0 0 0 4px rgba(255, 122, 89, 0.12);
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 56ch;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #dfe6ff;
+      font-size: 13px;
+    }
+
+    .hero-side {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .metric-value {
+      display: block;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-label {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hero-note {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 122, 89, 0.12), rgba(102, 217, 255, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #dbe4ff;
+      line-height: 1.7;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 26px 0 14px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      font-family: var(--serif);
+    }
+
+    .section-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .list li {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .bullet {
+      width: 12px;
+      height: 12px;
+      margin-top: 4px;
+      border-radius: 50%;
+      flex: none;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 0 0 5px rgba(102, 217, 255, 0.08);
+    }
+
+    .list strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .list span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .architecture {
+      display: grid;
+      gap: 16px;
+    }
+
+    .arch-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .arch-node {
+      position: relative;
+      padding: 18px 18px 18px 20px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .arch-node::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 18px;
+      bottom: 18px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    }
+
+    .arch-title {
+      display: block;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .arch-text {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .arch-link {
+      justify-self: center;
+      width: 2px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+    }
+
+    .arch-footer {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 18px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip-btn {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .chip-btn:hover,
+    .chip-btn:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.09);
+      outline: none;
+    }
+
+    .chip-btn.active {
+      border-color: rgba(255, 122, 89, 0.5);
+      background: linear-gradient(135deg, rgba(255, 122, 89, 0.22), rgba(102, 217, 255, 0.14));
+    }
+
+    .timeline-shell {
+      display: grid;
+      gap: 24px;
+    }
+
+    .year-block {
+      padding: 22px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .year-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .year {
+      font-size: 22px;
+      font-family: var(--serif);
+      margin: 0;
+    }
+
+    .year-count {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .paper-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(17, 25, 48, 0.9), rgba(10, 15, 30, 0.88));
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      min-height: 214px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .paper-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .paper-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .paper-acronym {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      font-family: var(--mono);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #dfe6ff;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .tag.dataset { background: rgba(102, 217, 255, 0.16); }
+    .tag.method { background: rgba(255, 122, 89, 0.16); }
+    .tag.benchmark { background: rgba(156, 255, 107, 0.14); }
+
+    .paper-contrib {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .paper-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-top: auto;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .link-btn {
+      text-decoration: none;
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 122, 89, 0.38), rgba(102, 217, 255, 0.22));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow: auto;
+      border-radius: 18px;
+      background: #07101e;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: #dce7ff;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .syntax-key { color: #8be9fd; }
+    .syntax-str { color: #f1fa8c; }
+    .syntax-num { color: #ffb86c; }
+    .syntax-bool { color: #bd93f9; }
+    .syntax-prop { color: #50fa7b; }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .roadmap-item {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .roadmap-item h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .roadmap-item p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding: 18px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .empty-state {
+      display: none;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed rgba(255, 255, 255, 0.16);
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .reveal {
+      animation: lift 600ms ease both;
+    }
+
+    @keyframes lift {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .grid-2,
+      .cards,
+      .roadmap {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head,
+      .year-head,
+      .paper-top,
+      .paper-footer {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        width: min(calc(100% - 20px), var(--max));
+        padding-top: 14px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .panel,
+      .year-block {
+        border-radius: 20px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .panel {
+        padding: 18px;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero reveal">
+      <article class="hero-main">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Emotion Computing Knowledge System</div>
+        <h1>情感图像分析时间线<br />与博客系统</h1>
+        <p class="lede">
+          一个面向情感计算领域的双层知识展示页：左侧是基于 Vue 的结构化时间线浏览，右侧是 Docusaurus 深度论文解析。所有内容都由统一 JSON 数据层驱动，并预留了从 Image 扩展到 Video 的演进路径。
+        </p>
+        <div class="hero-meta">
+          <span class="pill">Data-driven UI</span>
+          <span class="pill">Timeline / Card / Blog</span>
+          <span class="pill">Image-based Emotion</span>
+          <span class="pill">Video-ready Extension</span>
+        </div>
+      </article>
+      <aside class="hero-side">
+        <div class="metric-grid">
+          <div class="metric"><span class="metric-value">2</span><span class="metric-label">核心系统：Vue 时间线 + Docusaurus 博客</span></div>
+          <div class="metric"><span class="metric-value">3</span><span class="metric-label">主视图：Dataset / Method / Benchmark</span></div>
+          <div class="metric"><span class="metric-value">JSON</span><span class="metric-label">统一数据源，避免硬编码</span></div>
+          <div class="metric"><span class="metric-value">Video</span><span class="metric-label">预留多模态扩展分支</span></div>
+        </div>
+        <div class="hero-note">
+          这个页面将 README 中的架构、数据结构、启动方式和未来方向转成可浏览的展示界面，适合作为项目首页或演示版落地页。
+        </div>
+      </aside>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">设计原则</h2>
+          <p class="section-subtitle">把 README 里的核心约束转成可视化卡片，方便直接演示。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="panel">
+          <h3>系统原则</h3>
+          <ul class="list">
+            <li><span class="bullet"></span><div><strong>数据驱动 UI</strong><span>所有论文信息通过 JSON 统一控制，前端只负责渲染与交互。</span></div></li>
+            <li><span class="bullet"></span><div><strong>视图与内容解耦</strong><span>Vue 负责结构化浏览，Docusaurus 负责深度解释和知识沉淀。</span></div></li>
+            <li><span class="bullet"></span><div><strong>渐进式信息展示</strong><span>Timeline 提供概览，Card 展示摘要，Blog 承载分析深度。</span></div></li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>多模态规划</h3>
+          <ul class="list">
+            <li><span class="bullet"></span><div><strong>Image-based Emotion</strong><span>当前主线，围绕数据集、方法和基准形成完整浏览闭环。</span></div></li>
+            <li><span class="bullet"></span><div><strong>Video-based Emotion</strong><span>后续可在相同结构下扩展出视频时间线与新型论文视图。</span></div></li>
+            <li><span class="bullet"></span><div><strong>统一扩展接口</strong><span>通过 modality 字段区分分支，为未来数据库或 API 化预留接口。</span></div></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">系统架构</h2>
+          <p class="section-subtitle">直接把 README 里的结构图做成可读的层级展示。</p>
+        </div>
+      </div>
+      <div class="panel architecture">
+        <div class="arch-stack">
+          <div class="arch-node">
+            <span class="arch-title">Docusaurus 博客系统</span>
+            <span class="arch-text">承载方法分析、数据集构建说明和 Benchmark 解读，面向深度内容表达。</span>
+          </div>
+          <div class="arch-link"></div>
+          <div class="arch-node">
+            <span class="arch-title">Vue 时间线系统</span>
+            <span class="arch-text">主浏览层，负责 Dataset / Method / Benchmark 三视图、卡片浏览、年份分组和标签筛选。</span>
+          </div>
+          <div class="arch-link"></div>
+          <div class="arch-node">
+            <span class="arch-title">JSON 数据层</span>
+            <span class="arch-text">统一管理论文元数据，作为时间线与博客系统之间的共享事实源。</span>
+          </div>
+        </div>
+        <div class="arch-footer">
+          <span>Vue → 浏览与交互</span>
+          <span>Docusaurus → 深度内容</span>
+          <span>JSON → 单一数据源</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">时间线展示</h2>
+          <p class="section-subtitle">支持按类型和模态过滤，模拟 README 中的三视图浏览体验。</p>
+        </div>
+        <div class="controls">
+          <div class="control-group" id="typeFilters"></div>
+          <div class="control-group" id="modalityFilters"></div>
+        </div>
+      </div>
+      <div class="timeline-shell">
+        <div class="empty-state" id="emptyState">当前筛选条件下没有可展示的论文。请切换类型或模态。</div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">数据结构示例</h2>
+          <p class="section-subtitle">对应 README 中的 papers.json 规范，便于后续直接接入前端。</p>
+        </div>
+      </div>
+      <div class="panel code-panel">
+        <pre><code>{
+  <span class="syntax-prop">"id"</span>: <span class="syntax-str">"affectnet"</span>,
+  <span class="syntax-prop">"title"</span>: <span class="syntax-str">"AffectNet"</span>,
+  <span class="syntax-prop">"fullTitle"</span>: <span class="syntax-str">"AffectNet: A Database for Facial Expression, Valence, and Arousal Computing in the Wild"</span>,
+  <span class="syntax-prop">"acronym"</span>: <span class="syntax-str">"AN"</span>,
+  <span class="syntax-prop">"year"</span>: <span class="syntax-num">2017</span>,
+  <span class="syntax-prop">"type"</span>: <span class="syntax-str">"Dataset"</span>,
+  <span class="syntax-prop">"modality"</span>: <span class="syntax-str">"image"</span>,
+  <span class="syntax-prop">"tags"</span>: [<span class="syntax-str">"FER"</span>, <span class="syntax-str">"Image"</span>],
+  <span class="syntax-prop">"blog"</span>: {
+    <span class="syntax-prop">"enabled"</span>: <span class="syntax-bool">true</span>,
+    <span class="syntax-prop">"slug"</span>: <span class="syntax-str">"/blog/affectnet-review"</span>
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">启动方式</h2>
+          <p class="section-subtitle">把 README 里的运行命令整理成更适合浏览的展示区。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="panel">
+          <h3>Vue 时间线系统</h3>
+          <pre><code>cd timeline-app
+npm install
+npm run dev</code></pre>
+        </article>
+        <article class="panel">
+          <h3>Docusaurus 博客系统</h3>
+          <pre><code>cd docs-site
+npm install
+npm run start</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">未来扩展</h2>
+          <p class="section-subtitle">保留 README 中列出的演进方向，作为路线图展示。</p>
+        </div>
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-item"><h4>多标签组合筛选</h4><p>支持更复杂的交叉筛选条件，提升研究检索效率。</p></div>
+        <div class="roadmap-item"><h4>论文引用图谱</h4><p>从时间线进一步升级为知识网络，呈现文献关联关系。</p></div>
+        <div class="roadmap-item"><h4>视频情感分析分支</h4><p>复用同一套数据结构和视图逻辑，扩展到 Video-based Emotion。</p></div>
+      </div>
+    </section>
+
+    <div class="footer">EmoPaper showcase · 根据 README 生成的静态展示页</div>
+  </main>
+
+  <script>
+    const papers = [
+      {
+        id: "affectnet",
+        title: "AffectNet",
+        acronym: "AN",
+        year: 2017,
+        type: "Dataset",
+        modality: "image",
+        tags: ["FER", "Image"],
+        contribution: "大规模面部表情数据集，推动了野外场景情感识别研究。",
+        blog: { enabled: true, slug: "/blog/affectnet-review" }
+      },
+      {
+        id: "deepemotionnet",
+        title: "Deep Emotion Network",
+        acronym: "DEN",
+        year: 2015,
+        type: "Method",
+        modality: "image",
+        tags: ["CNN", "Emotion"],
+        contribution: "面向图像情感理解的深度方法代表，强调端到端表达学习。",
+        blog: { enabled: true, slug: "/blog/deepemotionnet-review" }
+      },
+      {
+        id: "ferplus",
+        title: "FERPlus Benchmark",
+        acronym: "FP",
+        year: 2016,
+        type: "Benchmark",
+        modality: "image",
+        tags: ["Benchmark", "FER"],
+        contribution: "通过更细粒度标注和评估协议，提升了基准比较的可信度。",
+        blog: { enabled: false, slug: "" }
+      },
+      {
+        id: "video-emo",
+        title: "Video Emotion Prototype",
+        acronym: "VEP",
+        year: 2024,
+        type: "Method",
+        modality: "video",
+        tags: ["Video", "Extension"],
+        contribution: "作为视频情感分析分支的占位展示，验证同构数据结构的可扩展性。",
+        blog: { enabled: false, slug: "" }
+      },
+      {
+        id: "expw",
+        title: "ExpW Dataset",
+        acronym: "EW",
+        year: 2018,
+        type: "Dataset",
+        modality: "image",
+        tags: ["Wild", "Dataset"],
+        contribution: "面向真实世界表情的样本集合，可用于补充跨域鲁棒性评估。",
+        blog: { enabled: true, slug: "/blog/expw-review" }
+      },
+      {
+        id: "multi-bench",
+        title: "Multi-modal Benchmark Protocol",
+        acronym: "MBP",
+        year: 2023,
+        type: "Benchmark",
+        modality: "video",
+        tags: ["Protocol", "Video"],
+        contribution: "为后续视频情感分析研究提供统一评价口径的示意性条目。",
+        blog: { enabled: false, slug: "" }
+      }
+    ];
+
+    const state = {
+      type: "All",
+      modality: "All"
+    };
+
+    const typeOrder = ["All", "Dataset", "Method", "Benchmark"];
+    const modalityOrder = ["All", "image", "video"];
+
+    const typeRoot = document.getElementById("typeFilters");
+    const modalityRoot = document.getElementById("modalityFilters");
+    const timelineRoot = document.getElementById("timeline");
+    const emptyState = document.getElementById("emptyState");
+
+    function prettyModality(value) {
+      return value === "All" ? "All" : value === "image" ? "Image" : "Video";
+    }
+
+    function filteredPapers() {
+      return papers.filter((paper) => {
+        const typeMatch = state.type === "All" || paper.type === state.type;
+        const modalityMatch = state.modality === "All" || paper.modality === state.modality;
+        return typeMatch && modalityMatch;
+      });
+    }
+
+    function renderControls() {
+      typeRoot.innerHTML = typeOrder.map((item) => `
+        <button class="chip-btn ${state.type === item ? "active" : ""}" data-kind="type" data-value="${item}" type="button">${item}</button>
+      `).join("");
+
+      modalityRoot.innerHTML = modalityOrder.map((item) => `
+        <button class="chip-btn ${state.modality === item ? "active" : ""}" data-kind="modality" data-value="${item}" type="button">${prettyModality(item)}</button>
+      `).join("");
+
+      document.querySelectorAll(".chip-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const kind = button.dataset.kind;
+          const value = button.dataset.value;
+          state[kind] = value;
+          renderControls();
+          renderTimeline();
+        });
+      });
+    }
+
+    function tagClass(type) {
+      return type.toLowerCase();
+    }
+
+    function renderTimeline() {
+      const items = filteredPapers();
+      emptyState.style.display = items.length ? "none" : "block";
+
+      const groups = items.reduce((acc, paper) => {
+        (acc[paper.year] ||= []).push(paper);
+        return acc;
+      }, {});
+
+      const years = Object.keys(groups).sort((a, b) => Number(b) - Number(a));
+
+      timelineRoot.innerHTML = years.map((year) => {
+        const group = groups[year];
+        const cards = group.map((paper) => `
+          <article class="paper-card">
+            <div class="paper-top">
+              <div>
+                <div class="meta-row">
+                  <span class="tag ${tagClass(paper.type)}">${paper.type}</span>
+                  <span class="tag">${prettyModality(paper.modality)}</span>
+                </div>
+                <h3 class="paper-title">${paper.title}</h3>
+              </div>
+              <span class="paper-acronym">${paper.acronym}</span>
+            </div>
+            <p class="paper-contrib">${paper.contribution}</p>
+            <div class="meta-row">${paper.tags.map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
+            <div class="paper-footer">
+              <span>${paper.blog.enabled ? "博客已启用" : "博客待补充"}</span>
+              <a class="link-btn" href="${paper.blog.slug || "#"}">${paper.blog.enabled ? "进入 Blog" : "查看占位"}</a>
+            </div>
+          </article>
+        `).join("");
+
+        return `
+          <section class="year-block">
+            <div class="year-head">
+              <div>
+                <h3 class="year">${year}</h3>
+                <div class="year-count">${group.length} 条记录 · ${state.type} · ${prettyModality(state.modality)}</div>
+              </div>
+            </div>
+            <div class="cards">${cards}</div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    renderControls();
+    renderTimeline();
+  </script>
+</body>
+</html>
