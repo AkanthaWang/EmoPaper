@@ -12,8 +12,7 @@
     "blog": {
       "enabled": true,
       "slug": "/blog/affectnet"
-    }
-    ,
+    },
     "venue": "CVPR (example)"
   },
   {
@@ -29,8 +28,7 @@
     "blog": {
       "enabled": true,
       "slug": "/blog/deepemotionnet"
-    }
-    ,
+    },
     "venue": "ECCV (example)"
   },
   {
@@ -46,8 +44,7 @@
     "blog": {
       "enabled": false,
       "slug": ""
-    }
-    ,
+    },
     "venue": "Benchmark"
   },
   {
@@ -63,8 +60,7 @@
     "blog": {
       "enabled": true,
       "slug": "/blog/expw"
-    }
-    ,
+    },
     "venue": "ICCV (example)"
   },
   {
@@ -80,8 +76,7 @@
     "blog": {
       "enabled": false,
       "slug": ""
-    }
-    ,
+    },
     "venue": "Workshop (example)"
   }
 ]

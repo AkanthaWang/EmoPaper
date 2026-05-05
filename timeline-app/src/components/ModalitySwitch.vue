@@ -3,6 +3,14 @@
     <button
       type="button"
       class="option"
+      :class="{ active: modelValue === 'All' }"
+      @click="$emit('update:modelValue', 'All')"
+    >
+      All
+    </button>
+    <button
+      type="button"
+      class="option"
       :class="{ active: modelValue === 'image' }"
       @click="$emit('update:modelValue', 'image')"
     >
@@ -23,7 +31,7 @@
 defineProps({
   modelValue: {
     type: String,
-    default: 'image',
+    default: 'All',
   },
 });
 
@@ -36,14 +44,15 @@ defineEmits(['update:modelValue']);
   gap: 0.5rem;
   padding: 0.35rem;
   border-radius: 999px;
-  background: #f3f6fb;
-  border: 1px solid #dbe3ef;
+  background: #f2f7fa;
+  border: 1px solid #d8e5ed;
+  width: fit-content;
 }
 
 .option {
   border: 0;
   background: transparent;
-  color: #4b5563;
+  color: #4f6479;
   border-radius: 999px;
   padding: 0.65rem 1rem;
   font: inherit;
@@ -52,8 +61,8 @@ defineEmits(['update:modelValue']);
 }
 
 .option.active {
-  background: #ffffff;
-  color: #111827;
+  background: linear-gradient(135deg, #ffffff 0%, #eef7f8 100%);
+  color: #16364f;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 </style>

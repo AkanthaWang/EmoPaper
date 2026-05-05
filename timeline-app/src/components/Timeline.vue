@@ -1,7 +1,11 @@
 <template>
   <div class="timeline">
+    <div v-if="!sortedYearGroups.length" class="empty-state">
+      <h3>暂无匹配结果</h3>
+      <p>可以切换类型、模态，或者尝试更短的关键词来查看全量数据。</p>
+    </div>
     <YearSection
-      v-for="(yearPapers, year) in groupedByYear"
+      v-for="[year, yearPapers] in sortedYearGroups"
       :key="year"
       :year="year"
       :papers="yearPapers"
@@ -26,31 +30,26 @@ const props = defineProps({
   },
   selectedModality: {
     type: String,
-    default: 'image',
+    default: 'All',
   },
   searchTerm: {
     type: String,
-    default: ''
+    default: '',
   },
   sortOrder: {
     type: String,
-    default: 'year-desc'
+    default: 'year-desc',
   },
 });
 
 defineEmits(['select-paper']);
 
-const filterState = computed(() => ({
-  selectedType: props.selectedType,
-  selectedModality: props.selectedModality,
-}));
-
-// pass search (no sort — removed per request)
-const { groupedByYear } = usePaperTimeline(
+const { sortedYearGroups } = usePaperTimeline(
   computed(() => props.papers),
-  computed(() => filterState.value.selectedType),
-  computed(() => filterState.value.selectedModality),
-  computed(() => props.searchTerm)
+  computed(() => props.selectedType),
+  computed(() => props.selectedModality),
+  computed(() => props.searchTerm),
+  computed(() => props.sortOrder)
 );
 </script>
 
@@ -58,5 +57,23 @@ const { groupedByYear } = usePaperTimeline(
 .timeline {
   display: grid;
   gap: 1.5rem;
+}
+
+.empty-state {
+  padding: 2.5rem 1.5rem;
+  border-radius: 24px;
+  border: 1px dashed #c4d5e3;
+  background: linear-gradient(180deg, #f8fbfd 0%, #f2f7fa 100%);
+  text-align: center;
+  color: #5b7086;
+}
+
+.empty-state h3 {
+  margin: 0 0 0.5rem;
+  color: #16364f;
+}
+
+.empty-state p {
+  margin: 0;
 }
 </style>

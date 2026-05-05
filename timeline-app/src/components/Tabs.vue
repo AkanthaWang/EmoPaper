@@ -22,6 +22,7 @@ defineProps({
   options: {
     type: Array,
     default: () => [
+      { label: 'All', value: 'All' },
       { label: 'Dataset', value: 'Dataset' },
       { label: 'Method', value: 'Method' },
       { label: 'Benchmark', value: 'Benchmark' },
@@ -40,9 +41,9 @@ defineEmits(['update:modelValue']);
 }
 
 .tab {
-  border: 1px solid #dbe3ef;
-  background: #ffffff;
-  color: #2d3748;
+  border: 1px solid #d7e4ef;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+  color: #284158;
   border-radius: 999px;
   padding: 0.7rem 1rem;
   font: inherit;
@@ -53,14 +54,14 @@ defineEmits(['update:modelValue']);
 .tab:hover,
 .tab:focus-visible {
   transform: translateY(-1px);
-  border-color: #a7b7d1;
+  border-color: #89abc3;
   outline: none;
 }
 
 .tab.active {
-  background: #1f2937;
+  background: linear-gradient(135deg, #12344f 0%, #1f6671 100%);
   color: #ffffff;
-  border-color: #1f2937;
-  box-shadow: 0 12px 30px rgba(31, 41, 55, 0.16);
+  border-color: transparent;
+  box-shadow: 0 12px 30px rgba(18, 52, 79, 0.2);
 }
 </style>

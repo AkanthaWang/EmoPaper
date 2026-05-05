@@ -19,7 +19,7 @@ export function usePaperTimeline(papers, selectedType, selectedModality, searchT
 
       if (!q) return true;
 
-      const hay = [paper.title, paper.acronym, (paper.tags || []).join(' '), paper.venue || '']
+      const hay = [paper.title, paper.fullTitle, paper.acronym, paper.contribution, (paper.tags || []).join(' '), paper.venue || '']
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
@@ -27,7 +27,7 @@ export function usePaperTimeline(papers, selectedType, selectedModality, searchT
     });
   });
 
-  const groupedByYear = computed(() => {
+  const sortedYearGroups = computed(() => {
     const groups = filteredPapers.value.reduce((accumulator, paper) => {
       const yearKey = String(paper.year);
       if (!accumulator[yearKey]) accumulator[yearKey] = [];
@@ -62,11 +62,11 @@ export function usePaperTimeline(papers, selectedType, selectedModality, searchT
       });
     }
 
-    return Object.fromEntries(entries);
+    return entries;
   });
 
   return {
     filteredPapers,
-    groupedByYear,
+    sortedYearGroups,
   };
 }
