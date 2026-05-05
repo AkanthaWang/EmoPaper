@@ -152,8 +152,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import papers from '../data/papers.json';
+import { ref, computed, watch, onMounted } from 'vue';
 import Tabs from '../components/Tabs.vue';
 import ModalitySwitch from '../components/ModalitySwitch.vue';
 import Timeline from '../components/Timeline.vue';
@@ -164,6 +163,21 @@ import { usePaperTimeline } from '../composables/usePaperTimeline';
 const selectedType = ref('All');
 const selectedModality = ref('All');
 const searchTerm = ref('');
+const papers = ref([]);
+
+onMounted(async () => {
+  try {
+    const response = await fetch('./data/papers.json');
+    if (!response.ok) {
+      throw new Error('Failed to load paper data.');
+    }
+
+    papers.value = await response.json();
+  } catch (error) {
+    console.error(error);
+    papers.value = [];
+  }
+});
 
 function getBlogUrl(slug) {
   if (!slug) return '#';
@@ -175,7 +189,7 @@ function getBlogUrl(slug) {
 }
 
 const enhancedPapers = computed(() =>
-  papers.map((paper) => ({
+  papers.value.map((paper) => ({
     ...paper,
     blog: paper.blog
       ? {

@@ -1,305 +1,173 @@
-# 📊 情感图像分析时间线与博客系统
+# EmoPaper
 
-## 🧠 项目简介
+EmoPaper 是一个基于 Vue 3 和 Vite 的情感计算论文展示项目，用于将数据集、方法、基准和扩展文章组织成可视化时间线与阅读页面，方便浏览、筛选和持续补充内容。
 
-本项目是一个用于**情感计算（Affective Computing）领域的研究可视化与知识管理系统**，用于系统整理情感图像分析领域的发展脉络，并支持未来扩展到情感视频分析任务。
+在线地址：
 
----
+- https://akanthawang.github.io/EmoPaper/
 
-## 🎯 项目目标
+## 项目功能
 
-本项目旨在解决情感计算领域研究碎片化问题，构建一个结构化的可视化知识系统：
+- 以时间线形式浏览情感计算相关论文
+- 按论文类型和模态进行筛选
+- 在右侧面板查看论文摘要信息
+- 通过 Markdown 文章页进行深入阅读
+- 使用 GitHub Actions 自动部署到 GitHub Pages
 
-### ✅ 1. 多维时间线浏览
+## 技术栈
 
-支持不同研究维度的独立演进分析：
+- Vue 3
+- Vite
+- JSON 静态数据
+- Markdown 文章
+- GitHub Pages
 
-* 数据集（Dataset）
-* 方法（Method）
-* 评估基准（Benchmark）
+## 项目结构
 
-👉 后续可扩展：
-
-* 情感视频分析（Video-based Affective Computing）
-
----
-
-### ✅ 2. 结构化论文展示系统
-
-* 卡片式论文浏览
-* 按年份自动分组
-* 按类型动态筛选
-* 支持模态扩展（Image / Video）
-
----
-
-### ✅ 3. 深度论文解析系统
-
-* 博客式论文解读
-* 方法结构分析
-* 数据集构建说明
-* Benchmark 设计解析
-
----
-
-### ✅ 4. 可扩展知识架构
-
-* JSON 驱动数据层
-* 组件化前端结构
-* 支持多模态扩展（Image → Video）
-
----
-
-# 🧠 设计原则（新增⭐重点）
-
-本系统遵循以下设计原则：
-
-### 1️⃣ 数据驱动 UI（Data-driven UI）
-
-所有论文信息统一由 JSON 控制，而非硬编码
-
----
-
-### 2️⃣ 视图与内容解耦
-
-* Vue：负责结构化浏览与交互
-* Docusaurus：负责深度内容表达
-
----
-
-### 3️⃣ 多模态分离（重要升级）
-
-当前系统支持：
-
-| 模态                  | 状态     |
-| ------------------- | ------ |
-| Image-based Emotion | ✔      |
-| Video-based Emotion | 🔜 可扩展 |
-
----
-
-### 4️⃣ 渐进式信息展示
-
-* Timeline（概览）
-* Card（摘要）
-* Blog（深度）
-
----
-
-# 🏗️ 系统架构
-
-```text id="arch-final"
-                        ┌────────────────────────────┐
-                        │   Docusaurus 博客系统     │
-                        │   （深度论文解析）        │
-                        │  - Markdown 文章          │
-                        │  - 方法/数据集分析        │
-                        │  - Benchmark 解读         │
-                        └────────────┬──────────────┘
-                                     ↑ 链接跳转
-                                     │
-┌────────────────────────────────────┴────────────────────────────┐
-│                    Vue 时间线系统（主系统）                     │
-│  - Dataset / Method / Benchmark 三视图                          │
-│  - 卡片式论文浏览                                               │
-│  - 年份分组                                                     │
-│  - 标签筛选                                                     │
-│  - 模态扩展（Image / Video）                                    │
-└─────────────────────────────────────────────────────────────────┘
-                                     │
-                             JSON 数据层（统一管理）
+```text
+EmoPaper/
+|- src/
+|  |- components/
+|  |- composables/
+|  |- views/
+|  |  `- Home.vue
+|  `- main.js
+|- public/
+|  |- blog/
+|  |  |- viewer.html
+|  |  `- *.md
+|  |- data/
+|  |  `- papers.json
+|  `- img/
+|- .github/
+|  `- workflows/
+|     `- deploy.yml
+|- vite.config.js
+`- README.md
 ```
 
----
+## 本地开发
 
-# 🧰 技术栈
-
-## 前端系统
-
-* Vue.js（Vue 3）
-* Vite
-* 可选状态管理：Pinia
-* 可选路由系统：Vue Router
-
----
-
-## 博客系统
-
-* Docusaurus
-* Markdown 内容驱动
-* 静态站点生成（SSG）
-
----
-
-## 数据层
-
-* JSON 结构化数据
-* 无需后端
-
----
-
-# 📁 项目结构
-
-```text id="structure-final"
-emotion-timeline-project/
-│
-├── timeline-app/                 # Vue 主应用
-│   ├── src/
-│   │   ├── data/
-│   │   │     └── papers.json     # ⭐统一数据源
-│   │   │
-│   │   ├── components/
-│   │   │     ├── Timeline.vue
-│   │   │     ├── YearSection.vue
-│   │   │     ├── PaperCard.vue
-│   │   │     ├── PaperDetail.vue
-│   │   │     └── Tabs.vue
-│   │   │
-│   │   ├── views/
-│   │   │     └── Home.vue
-│   │   └── main.js
-│   │
-│   └── vite.config.js
-│
-├── docs-site/                    # Docusaurus 博客系统
-│   ├── blog/
-│   │     ├── image/
-│   │     ├── video/
-│   │     ├── affectnet.md
-│   │     └── deepemotionnet.md
-│   │
-│   ├── docusaurus.config.js
-│   └── sidebars.js
-│
-└── README.md
-```
-
----
-
-# 📦 数据结构规范（增强版）
-
-```json id="data-final"
-{
-  "id": "affectnet",
-  "title": "AffectNet",
-  "fullTitle": "AffectNet: A Database for Facial Expression, Valence, and Arousal Computing in the Wild",
-  "acronym": "AN",
-
-  "year": 2017,
-  "type": "Dataset",
-
-  "modality": "image",
-
-  "tags": ["FER", "Image"],
-  "contribution": "大规模面部表情数据集",
-
-  "blog": {
-    "enabled": true,
-    "slug": "/blog/affectnet-review"
-  }
-}
-```
-
----
-
-# 🔄 系统运行流程
-
-## 1️⃣ 时间线浏览（Vue）
-
-* 选择模态（Image / Video）
-* 选择类型（Dataset / Method / Benchmark）
-* 自动按年份分组展示
-
----
-
-## 2️⃣ 论文卡片展示
-
-包含：
-
-* 标题（title + acronym）
-* 年份
-* 标签
-* 简要贡献
-* 博客入口
-
----
-
-## 3️⃣ 深度阅读（Docusaurus）
-
-进入：
-
-* 方法分析
-* 数据集解析
-* Benchmark 对比
-* 实验结果解读
-
----
-
-# 🎨 项目核心特点（增强版）
-
-## 📊 1. 多模态时间线系统（扩展能力）
-
-* Image-based Emotion Analysis
-* Video-based Emotion Analysis（可扩展）
-
----
-
-## 🧠 2. 结构化知识体系
-
-* JSON 驱动
-* 强一致数据结构
-
----
-
-## 📝 3. 双层知识系统
-
-* Vue：结构化浏览
-* Docusaurus：深度理解
-
----
-
-## 🔗 4. 解耦架构设计
-
-* 前端展示层独立
-* 内容系统独立
-
----
-
-# 🚀 启动方式
+安装依赖：
 
 ```bash
-# Vue系统
-cd timeline-app
 npm install
+```
+
+启动开发环境：
+
+```bash
 npm run dev
 ```
 
+执行构建：
+
 ```bash
-# 博客系统
-cd docs-site
-npm install
-npm run start
+npm run build
 ```
 
+## 部署说明
+
+当前项目已经配置为通过 GitHub Pages 自动发布。
+
+部署流程如下：
+
+1. 将修改推送到 `master` 分支
+2. GitHub Actions 自动执行 `.github/workflows/deploy.yml`
+3. 工作流执行 `npm ci` 和 `npm run build`
+4. 构建产物 `dist/` 自动发布到 GitHub Pages
+5. 页面发布地址为 `https://akanthawang.github.io/EmoPaper/`
+
+项目中的 Vite 基础路径配置为：
+
+```js
+base: '/EmoPaper/'
+```
+
+这样配置的原因是该站点并不是部署在域名根路径，而是部署在仓库子路径 `/EmoPaper/` 下。
+
+## 如何新增论文内容
+
+如果你要新增一条论文卡片，以及对应的 `Read More` 阅读页面，需要补充论文数据和文章内容。
+
+### 1. 添加论文数据
+
+只需要修改这个文件：
+
+- `public/data/papers.json`
+
+新增一条类似下面的记录：
+
+```json
+{
+  "id": "new-paper",
+  "title": "New Paper",
+  "fullTitle": "New Paper Full Title",
+  "acronym": "NP",
+  "year": 2026,
+  "type": "Method",
+  "modality": "image",
+  "tags": ["FER", "Image"],
+  "contribution": "这里填写论文贡献简介。",
+  "blog": {
+    "enabled": true,
+    "slug": "/blog/new-paper"
+  },
+  "venue": "CVPR 2026"
+}
+```
+
+### 2. 添加文章内容
+
+在下面这个位置新建 Markdown 文件：
+
+- `public/blog/new-paper.md`
+
+示例内容：
+
+```md
+---
+title: New Paper Analysis
 ---
 
-# 🔮 未来扩展方向（升级版）
+# New Paper Analysis
 
-* 🔍 多标签组合筛选系统
-* 📊 Benchmark 自动排行可视化
-* 🔗 论文引用关系图谱
-* 🎬 情感视频分析时间线（Video branch）
-* 🤖 AI 自动论文摘要生成
-* 🌐 在线数据库接入（API化）
+## 简介
 
----
+在这里写论文背景和核心问题。
 
-# 📌 项目总结
+## 方法
 
-本项目构建了一个面向情感计算领域的**双层知识系统架构**：
+在这里写方法结构和思路。
 
-* Vue 负责构建**结构化时间线浏览系统**
-* Docusaurus 负责构建**深度学术知识解析系统**
+## 结果
 
-同时支持从**图像情感分析 → 视频情感分析**的扩展演进路径，形成一个可持续扩展的研究知识平台。
+在这里写实验结果、图表说明或阅读笔记。
+```
 
+### 3. 这些名字必须一致
+
+- `id`：`new-paper`
+- `blog.slug`：`/blog/new-paper`
+- Markdown 文件名：`public/blog/new-paper.md`
+
+如果这三个地方不一致，`Read More` 将无法正确打开对应文章。
+
+## 当前维护注意事项
+
+当前项目已经统一为单一数据源：
+
+- `public/data/papers.json`
+
+它同时供以下两个部分使用：
+
+- Vue 主页面
+- `viewer.html` 文章阅读页
+
+因此你后续新增、删除或修改论文时，只需要维护这一份数据即可。
+
+## 后续可继续优化
+
+- 统一 Markdown 和文章文件编码，避免中文乱码
+- 增加新增论文模板，降低补充内容成本
+- 增强搜索、标签统计和筛选体验
